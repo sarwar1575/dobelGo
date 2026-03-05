@@ -1,23 +1,10 @@
-"use client";
+
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-  LayoutDashboard,
-  Users,
-  UserCircle,
-  UserCog,
-  LogOut,
-  X,
-} from "lucide-react";
+import { LogOut, X } from "lucide-react";
 import { cn } from "@/lib/utils";
-
-const menuItems = [
-  { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { name: "User", href: "/user", icon: Users },
-  { name: "User2", href: "/user2", icon: UserCircle },
-  { name: "Settings", href: "/settings", icon: UserCog },
-];
+import { sidebarMenuItems } from "@/config/sidebarMenu";
 
 interface SidebarProps {
   /** Mobile open state; on desktop sidebar is always visible */
@@ -56,7 +43,7 @@ export const Sidebar = ({ isOpen = false, onClose }: SidebarProps) => {
 
       {/* Navigation Links */}
       <nav className="flex-1 px-4 space-y-2 overflow-hidden pb-4">
-        {menuItems.map((item) => {
+        {sidebarMenuItems.map((item) => {
           const Icon = item.icon;
           const isActive = pathname === item.href;
           return (
