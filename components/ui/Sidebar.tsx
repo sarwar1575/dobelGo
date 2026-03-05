@@ -14,9 +14,9 @@ import { cn } from "@/lib/utils";
 
 const menuItems = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { name: "User", href: "/dashboard/user", icon: Users },
-  { name: "User2", href: "/dashboard/user2", icon: UserCircle },
-  { name: "Settings", href: "/dashboard/settings", icon: UserCog },
+  { name: "User", href: "/user", icon: Users },
+  { name: "User2", href: "/user2", icon: UserCircle },
+  { name: "Settings", href: "/settings", icon: UserCog },
 ];
 
 interface SidebarProps {
