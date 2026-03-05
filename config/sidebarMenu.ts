@@ -15,7 +15,7 @@ export type SidebarMenuItem = {
 export const sidebarMenuItems: SidebarMenuItem[] = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { name: "User", href: "/user", icon: Users },
-  { name: "User2", href: "/user2", icon: UserCircle },
+  { name: "Settings", href: "/settings", icon: UserCircle },
   { name: "Category", href: "/category", icon: UserCog },
 ];
 
