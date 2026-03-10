@@ -1,4 +1,5 @@
 import React, { ButtonHTMLAttributes, ReactNode } from "react";
+import { cn } from "@/lib/utils";
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: ReactNode;
@@ -28,7 +29,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         "bg-gray-200 hover:bg-gray-300 text-black",
     };
 
-    const combinedClassName = `${baseStyle} ${variants[variant]} ${className}`;
+    const combinedClassName = cn(baseStyle, variants[variant], className);
 
     return (
       <button

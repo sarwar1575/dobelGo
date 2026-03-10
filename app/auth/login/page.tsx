@@ -17,15 +17,46 @@ type LoginSchema = z.infer<typeof loginSchema>;
 export const LoginForm = () => {
   const router = useRouter();
 
-  const handleLogin = async (data: LoginSchema) => {
-    console.log("dobelGo Admin Login Attempt:", data);
+/* page.tsx ke handleLogin function mein ye change karein */
+
+const handleLogin = async (data: LoginSchema) => {
+  try {
+    // Port 3000 ka use karein aur credentials add karein
+    const res = await fetch("http://localhost:3000/api/auth/admin/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include", // Ye Cookies/Sessions ke liye zaroori hai
+      body: JSON.stringify(data),
+    });
+
+    
+  
+
+
+    const result = await res.json();
+
+    if (!res.ok) {
+      throw new Error(result.message || "Login failed");
+    }
+
     showAlert({
       type: "success",
       title: "Login Successful",
       text: "Welcome to dashboard",
     });
+
     router.push("/dashboard");
-  };
+
+  } catch (error: any) {
+    showAlert({
+      type: "error",
+      title: "Login Failed",
+      text: error.message || "Something went wrong",
+    });
+  }
+};
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">

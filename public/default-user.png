@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <!-- Background -->
+  <rect width="200" height="200" fill="#e5e7eb"/>
+  <!-- Default user icon -->
+  <circle cx="100" cy="70" r="35" fill="#9ca3af"/>
+  <path d="M 50 180 Q 50 130 100 130 Q 150 130 150 180 Z" fill="#9ca3af"/>
+</svg>

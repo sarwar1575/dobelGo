@@ -15,6 +15,7 @@ interface FormProps<TFormValues extends FieldValues> {
   onSubmit: SubmitHandler<TFormValues>;
   children: (methods: UseFormReturn<TFormValues>) => React.ReactNode;
   schema: ZodTypeAny;
+  defaultValues?: UseFormProps<TFormValues>["defaultValues"];
   formConfig?: UseFormProps<TFormValues>;
   className?: string;
 }
@@ -23,11 +24,13 @@ export const Form = <TFormValues extends FieldValues>({
   onSubmit,
   children,
   schema,
+  defaultValues,
   formConfig,
   className,
 }: FormProps<TFormValues>) => {
   const methods = useForm<TFormValues>({
     ...formConfig,
+    defaultValues,
     resolver: zodResolver(schema as any) as Resolver<TFormValues>,
   });
 

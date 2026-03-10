@@ -2,249 +2,237 @@
 
 import React, { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input/Input";
+import {
+  Users,
+  Car,
+  ShieldCheck,
+  Landmark,
+  Siren,
+  ArrowUpRight,
+  TrendingUp,
+  Activity,
+  Clock
+} from "lucide-react";
+import Link from "next/link";
 
-// --- Tab Card Component ---
-const DashboardTab = ({
-  label,
-  value,
+// --- Premium Stat Card ---
+const StatCard = ({
   title,
-  color,
-  isActive,
-  onClick,
+  value,
+  icon: Icon,
+  trend,
+  color
 }: {
-  label: string;
-  value: string;
   title: string;
+  value: string;
+  icon: any;
+  trend?: string;
   color: string;
-  isActive: boolean;
-  onClick: () => void;
 }) => (
-  <button
-    onClick={onClick}
-    className={`flex-1 text-left p-5 rounded-2xl transition-all border ${
-      isActive
-        ? "bg-white shadow-md"
-        : "bg-gray-100 border-transparent opacity-70 hover:opacity-100"
-    }`}
-  >
-    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
-      {label}
-    </span>
-    <h3 className="text-sm font-semibold text-gray-700 mt-1">{title}</h3>
-    <p className="text-2xl font-black text-gray-900 mt-1">{value}</p>
-  </button>
+  <div className="bg-white p-7 rounded-[2.5rem] border border-gray-100 shadow-sm hover:shadow-xl hover:shadow-gray-200/50 transition-all duration-500 group">
+    <div className="flex justify-between items-start mb-6">
+      <div className={`p-4 rounded-2xl ${color} text-white shadow-lg`}>
+        <Icon size={24} />
+      </div>
+      {trend && (
+        <span className="flex items-center gap-1 text-xs font-black text-emerald-500 bg-emerald-50 px-3 py-1.5 rounded-full">
+          <TrendingUp size={12} />
+          {trend}
+        </span>
+      )}
+    </div>
+    <p className="text-gray-400 text-xs font-black uppercase tracking-widest mb-1">{title}</p>
+    <div className="flex items-end justify-between">
+      <h3 className="text-3xl font-black text-gray-900 tracking-tight">{value}</h3>
+      <div className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-300 group-hover:bg-gray-900 group-hover:text-white transition-all">
+        <ArrowUpRight size={16} />
+      </div>
+    </div>
+  </div>
 );
 
-type TableRow = string[];
-
-interface TableConfig {
-  heading: string;
-  columns: string[];
-  rows: TableRow[];
-}
+// --- Verification Alert Card ---
+const VerificationQuickLink = ({ title, count, href, icon: Icon, color }: any) => (
+  <Link href={href} className="flex items-center justify-between p-6 bg-gray-50/50 hover:bg-white rounded-3xl border border-transparent hover:border-gray-100 hover:shadow-lg transition-all duration-300 group">
+    <div className="flex items-center gap-4">
+      <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${color} text-white shadow-sm`}>
+        <Icon size={20} />
+      </div>
+      <div>
+        <h4 className="font-bold text-gray-800 tracking-tight">{title}</h4>
+        <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Pending Review</p>
+      </div>
+    </div>
+    <div className="flex items-center gap-3">
+      <span className="bg-white px-3 py-1 rounded-full text-xs font-black text-gray-900 border border-gray-100 shadow-sm group-hover:bg-gray-900 group-hover:text-white transition-colors">
+        {count}
+      </span>
+      <ArrowUpRight size={16} className="text-gray-300 group-hover:text-gray-900 transition-colors" />
+    </div>
+  </Link>
+);
 
 export default function DashboardPage() {
-  // 1. State to track active tab
-  const [activeTab, setActiveTab] = useState<
-    "Fleet" | "Drivers" | "Service" | "Issues" | "Finance"
-  >("Fleet");
-
-  // 2. Search state
   const [searchQuery, setSearchQuery] = useState("");
 
-  // 3. Mock Data for Tables (with rows to enable real searching)
-  const tableContent: Record<
-    "Fleet" | "Drivers" | "Service" | "Issues" | "Finance",
-    TableConfig
-  > = {
-    Fleet: {
-      heading: "All Rides History",
-      columns: ["Ride ID", "Customer", "Driver", "Status", "Amount"],
-      rows: [
-        ["#F-1021", "Rahul Sharma", "Driver 21", "Completed", "₹320"],
-        ["#F-1022", "Anita Singh", "Driver 14", "Ongoing", "₹210"],
-        ["#F-1023", "John Doe", "Driver 03", "Cancelled", "₹0"],
-        ["#F-1024", "Priya Verma", "Driver 09", "Completed", "₹450"],
-        ["#F-1025", "Arjun Mehta", "Driver 18", "Completed", "₹380"],
-      ],
-    },
-    Drivers: {
-      heading: "Active Drivers List",
-      columns: ["Driver ID", "Name", "Vehicle", "Rating", "Status"],
-      rows: [
-        ["#D-501", "Rahul Kumar", "WagonR", "4.8", "Online"],
-        ["#D-502", "Sneha Rao", "Swift", "4.9", "On Trip"],
-        ["#D-503", "Imran Ali", "i20", "4.6", "Offline"],
-        ["#D-504", "Neha Gupta", "Baleno", "4.7", "Online"],
-        ["#D-505", "Aman Singh", "Dzire", "4.5", "Online"],
-      ],
-    },
-    Service: {
-      heading: "Pending Service Requests",
-      columns: ["Ticket ID", "Subject", "Priority", "Time"],
-      rows: [
-        ["#S-9001", "App Crashing", "High", "10:24 AM"],
-        ["#S-9002", "Payment Issue", "Medium", "09:10 AM"],
-        ["#S-9003", "Driver Not Arrived", "High", "Yesterday"],
-        ["#S-9004", "Refund Request", "Low", "2 days ago"],
-        ["#S-9005", "Profile Update", "Low", "1 week ago"],
-      ],
-    },
-    Issues: {
-      heading: "Reported Issues",
-      columns: ["Issue ID", "User", "Type", "Resolution"],
-      rows: [
-        ["#I-3001", "Rahul Sharma", "Safety", "In Progress"],
-        ["#I-3002", "Anita Singh", "Payment", "Resolved"],
-        ["#I-3003", "John Doe", "Service", "Pending"],
-        ["#I-3004", "Priya Verma", "Behaviour", "In Review"],
-        ["#I-3005", "Arjun Mehta", "App Bug", "Resolved"],
-      ],
-    },
-    Finance: {
-      heading: "Transaction Logs",
-      columns: ["Txn ID", "Date", "Method", "Amount", "Status"],
-      rows: [
-        ["#T-8001", "21 Feb 2026", "UPI", "₹220", "Success"],
-        ["#T-8002", "21 Feb 2026", "Card", "₹540", "Pending"],
-        ["#T-8003", "20 Feb 2026", "Cash", "₹120", "Success"],
-        ["#T-8004", "19 Feb 2026", "UPI", "₹300", "Refunded"],
-        ["#T-8005", "18 Feb 2026", "Wallet", "₹450", "Success"],
-      ],
-    },
-  };
-
-  // 4. Reset search when tab changes
-  useEffect(() => {
-    setSearchQuery("");
-  }, [activeTab]);
-
-  const currentTable = tableContent[activeTab];
-
-  const filteredRows = currentTable.rows.filter((row) =>
-    row.some((cell) =>
-      cell.toLowerCase().includes(searchQuery.trim().toLowerCase())
-    )
-  );
+  // Verification Counts (Mock for UI, could be fetched)
+  const [counts, setCounts] = useState({
+    drivers: 12,
+    vehicles: 8,
+    documents: 24,
+    bank: 5,
+    emergency: 3
+  });
 
   return (
-    <div className="min-h-screen bg-[#FBFBFB] p-8">
-      <div className="mb-10">
-        <h1 className="text-3xl font-extrabold text-gray-900">
-          DobelGo Control Center
-        </h1>
-        <p className="text-gray-500">
-          Click on a tab to view detailed records.
-        </p>
-      </div>
-
-      {/* --- 5 Tabs (Clickable) --- */}
-      <div className="flex flex-wrap gap-4 mb-10">
-        <DashboardTab
-          label="Fleet"
-          title="Total Rides"
-          value="1,420"
-          color="#EAB308"
-          isActive={activeTab === "Fleet"}
-          onClick={() => setActiveTab("Fleet")}
-        />
-        <DashboardTab
-          label="Drivers"
-          title="Active Now"
-          value="382"
-          color="#22C55E"
-          isActive={activeTab === "Drivers"}
-          onClick={() => setActiveTab("Drivers")}
-        />
-        <DashboardTab
-          label="Service"
-          title="Pending"
-          value="14"
-          color="#F97316"
-          isActive={activeTab === "Service"}
-          onClick={() => setActiveTab("Service")}
-        />
-        <DashboardTab
-          label="Issues"
-          title="Cancelled"
-          value="23"
-          color="#EF4444"
-          isActive={activeTab === "Issues"}
-          onClick={() => setActiveTab("Issues")}
-        />
-        <DashboardTab
-          label="Finance"
-          title="Earnings"
-          value="₹12,450"
-          color="#3B82F6"
-          isActive={activeTab === "Finance"}
-          onClick={() => setActiveTab("Finance")}
-        />
-      </div>
-
-      {/* --- Dynamic Table Section --- */}
-      <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100 animate-in fade-in slide-in-from-bottom-4 duration-500">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-6">
-          <h2 className="text-xl font-bold text-gray-800">
-            {currentTable.heading}
-          </h2>
-          <div className="flex items-center gap-3 w-full sm:w-auto sm:justify-end">
-            <Input
-              type="text"
-              placeholder="Search"
-              className="h-9 w-full sm:w-64"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-            <button className="text-sm font-bold text-yellow-600 hover:underline whitespace-nowrap">
-              Export CSV
-            </button>
+    <div className="min-h-screen bg-[#FBFBFB] p-10">
+      {/* Header section with profile glance */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 mb-12">
+        <div>
+          <h1 className="text-4xl font-black text-gray-900 tracking-tighter">
+            Control <span className="text-yellow-500">Center</span>
+          </h1>
+          <div className="flex items-center gap-3 mt-2">
+            <div className="flex items-center gap-1.5 bg-emerald-50 text-emerald-600 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider">
+              <Activity size={12} />
+              Systems Active
+            </div>
+            <p className="text-gray-400 font-medium text-sm">Welcome back, Admin. Here's what's happening today.</p>
           </div>
         </div>
 
-        <div className="overflow-x-auto">
-          <table className="w-full text-left">
-            <thead>
-              <tr className="border-b border-gray-100">
-                {currentTable.columns.map((col) => (
-                  <th
-                    key={col}
-                    className="py-4 px-2 text-xs font-bold text-gray-400 uppercase tracking-wider"
-                  >
-                    {col}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {filteredRows.length === 0 ? (
-                <tr>
-                  <td
-                    colSpan={currentTable.columns.length}
-                    className="py-6 px-2 text-sm text-gray-500 text-center"
-                  >
-                    No records match your search.
-                  </td>
-                </tr>
-              ) : (
-                filteredRows.map((row, rowIndex) => (
-                  <tr
-                    key={rowIndex}
-                    className="border-b border-gray-50 hover:bg-gray-50 transition-colors"
-                  >
-                    {row.map((cell, cellIndex) => (
-                      <td
-                        key={cellIndex}
-                        className="py-4 px-2 text-sm text-gray-600 font-medium"
-                      >
-                        {cell}
-                      </td>
-                    ))}
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+        
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+        {/* Left Column: Stats and Main Charts Area placeholder */}
+        <div className="lg:col-span-2 space-y-10">
+          {/* <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <StatCard
+              title="Total Fleet"
+              value="1,420"
+              icon={Car}
+              trend="+12.5%"
+              color="bg-blue-600"
+            />
+            <StatCard
+              title="Active Drivers"
+              value="382"
+              icon={Users}
+              trend="+4.2%"
+              color="bg-emerald-500"
+            />
+            <StatCard
+              title="Total Revenue"
+              value="₹12.4k"
+              icon={Landmark}
+              trend="+18.1%"
+              color="bg-yellow-500"
+            />
+            <StatCard
+              title="Avg Response"
+              value="4.2m"
+              icon={Clock}
+              color="bg-indigo-600"
+            />
+          </div> */}
+
+          {/* Activity Table Placeholder */}
+          <div className="bg-white rounded-[3rem] p-10 shadow-sm border border-gray-100">
+            <div className="flex items-center justify-between mb-8">
+              <h3 className="text-xl font-black text-gray-900">Recent Activity</h3>
+              <Input
+                placeholder="Search activity..."
+                className="w-64 bg-gray-50 border-none rounded-2xl font-semibold"
+              />
+            </div>
+
+            <div className="space-y-6">
+              {[1, 2, 3, 4, 5].map((i) => (
+                <div key={i} className="flex items-center justify-between py-4 border-b border-gray-50 last:border-0 hover:bg-gray-50/50 transition-all rounded-2xl px-4 -mx-4">
+                  <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center text-gray-400">
+                      <Activity size={18} />
+                    </div>
+                    <div>
+                      <p className="text-sm font-bold text-gray-800">New Driver Onboarded</p>
+                      <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest mt-1">2 mins ago</p>
+                    </div>
+                  </div>
+                  <span className="text-xs font-black text-blue-500">DETAILS</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Right Column: Verification Hub */}
+        <div className="lg:col-span-1 space-y-8">
+          <div className="bg-white rounded-[3rem] p-10 shadow-xl shadow-gray-200/40 border border-gray-50">
+            <div className="flex items-center gap-4 mb-8">
+              <div className="p-3 bg-red-50 text-red-500 rounded-2xl">
+                <ShieldCheck size={24} />
+              </div>
+              <div>
+                <h3 className="text-xl font-black text-gray-900 tracking-tight leading-none mb-1">Verification Hub</h3>
+                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Awaiting Action</p>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <VerificationQuickLink
+                title="Drivers"
+                count={counts.drivers}
+                href="/dashboard/driver-verification"
+                icon={Users}
+                color="bg-blue-500"
+              />
+              <VerificationQuickLink
+                title="Vehicles"
+                count={counts.vehicles}
+                href="/dashboard/vehicle-verification"
+                icon={Car}
+                color="bg-orange-500"
+              />
+              <VerificationQuickLink
+                title="Documents"
+                count={counts.documents}
+                href="/dashboard/document-verification"
+                icon={ShieldCheck}
+                color="bg-indigo-600"
+              />
+              <VerificationQuickLink
+                title="Bank Accounts"
+                count={counts.bank}
+                href="/dashboard/bank-verification"
+                icon={Landmark}
+                color="bg-emerald-500"
+              />
+              <VerificationQuickLink
+                title="Emergency Contacts"
+                count={counts.emergency}
+                href="/dashboard/emergency-verification"
+                icon={Siren}
+                color="bg-rose-600"
+              />
+            </div>
+
+            <button className="w-full mt-10 py-5 bg-gray-900 text-white rounded-[2rem] font-black text-xs uppercase tracking-[0.2em] shadow-xl shadow-gray-200 hover:bg-gray-800 transition-all active:scale-95">
+              View All Reports
+            </button>
+          </div>
+
+          {/* Secondary Card */}
+          {/* <div className="bg-gradient-to-br from-yellow-400 to-orange-500 rounded-[3rem] p-10 text-white shadow-xl shadow-yellow-100 relative overflow-hidden group">
+            <div className="relative z-10">
+              <h4 className="text-2xl font-black tracking-tight leading-none mb-2">Fleet Expansion</h4>
+              <p className="text-white/80 text-sm font-medium mb-8">Onboard 50 new drivers this week to reach target.</p>
+              <button className="bg-white text-orange-600 px-8 py-3 rounded-full font-black text-xs uppercase tracking-widest shadow-lg">
+                RECRUIT NOW
+              </button>
+            </div>
+            <Activity className="absolute -bottom-10 -right-10 text-white/10 w-48 h-48 group-hover:scale-110 transition-transform duration-700" />
+          </div> */}
         </div>
       </div>
     </div>
